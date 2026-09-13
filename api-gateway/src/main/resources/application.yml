@@ -1,0 +1,54 @@
+server:
+  port: 8222
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      # Cấu hình định tuyến (Routing Rules)
+      routes:
+        # Route cho Customer Service
+        - id: customer-service-route
+          uri: lb://customer-service
+          predicates:
+            - Path=/api/customers/**
+
+        # Route cho Account Service
+        - id: account-service-route
+          uri: lb://account-service
+          predicates:
+            - Path=/api/accounts/**
+
+        # Route cho Transaction Service
+        - id: transaction-service-route
+          uri: lb://transaction-service
+          predicates:
+            - Path=/api/transactions/**
+
+        # Cấu hình thêm (Ví dụ: Loan Service nếu có)
+        - id: loan-service-route
+          uri: lb://loan-service
+          predicates:
+            - Path=/api/loans/**
+
+# Cấu hình đăng ký và khám phá dịch vụ qua Eureka
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+
+# Bật Actuator Endpoint để quản lý API Gateway dễ dàng
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
